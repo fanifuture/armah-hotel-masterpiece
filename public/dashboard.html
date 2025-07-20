@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard</title>
+    <link rel="stylesheet" href="public/css/style.css">
+</head>
+<body style="background-color: #e9ecef;">
+    <header style="background-color: var(--primary-color); color: white; padding: 20px; text-align: center;">
+        <h1 style="color: var(--secondary-color); margin: 0;">Live Orders</h1>
+    </header>
+
+    <div class="container" style="display: flex; flex-wrap: wrap; gap: 20px; max-width: 1200px;">
+        <!-- New Order Example -->
+        <div class="card order-card" style="flex-basis: 300px; border-left: 5px solid var(--secondary-color);">
+            <h2>Table 12 <span style="font-size: 0.7em; color: #666;">(New)</span></h2>
+            <p><strong>Time:</strong> 7:32 PM</p>
+            <ul>
+                <li>2x Doro Wat</li>
+                <li>1x Veggie Combo</li>
+                <li>3x St. George Beer</li>
+            </ul>
+            <button class="btn" style="width: 100%;">Acknowledge Order</button>
+            <!-- Temporary "Help Request" Card Example -->
+<div class="card order-card" style="flex-basis: 300px; border-left: 5px solid #dc3545; background-color: #fff0f1;">
+    <h2>ASSISTANCE REQUEST</h2>
+    <p style="font-size: 2em; font-weight: bold; text-align: center; margin: 20px 0;">Table 9</p>
+    <p><strong>Time:</strong> 7:45 PM</p>
+    <button class="btn" style="width: 100%; background-color: #28a745;">Mark as Resolved</button>
+</div>
+        </div>
+
+        <!-- Acknowledged Order Example -->
+        <div class="card order-card" style="flex-basis: 300px;">
+            <h2>Table 7</h2>
+            <p><strong>Time:</strong> 7:28 PM</p>
+            <ul>
+                <li>1x Kitfo</li>
+            </ul>
+            <button class="btn" style="background-color: #6c757d; width: 100%;">Mark as Completed</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+/* --- Google Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap');
+
+/* --- Color & Font Definitions (Our Brand) --- */
+:root {
+    --primary-color: #0c3b2e; /* Dark Green */
+    --secondary-color: #ffba08; /* Gold/Yellow */
+    --text-color: #333;
+    --light-bg: #f8f9fa;
+    --border-color: #ddd;
+    --heading-font: 'Playfair Display', serif;
+    --body-font: 'Poppins', sans-serif;
+}
+
+body {
+    font-family: var(--body-font);
+    background-color: grey;
+    color: var(--text-color);
+    margin: 0;
+}
+
+/* --- Reusable Components --- */
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.btn {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+    background-color: #e0a407;
+}
+
+.card {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+h1, h2, h3 {
+    font-family: var(--heading-font);
+    color: var(--primary-color);
+}
+/* --- New Styles for Menu Item Images --- */
+.menu-item {
+    display: flex; /* Use flexbox for better layout */
+    gap: 20px;     /* Add some space between the image and the text */
+    align-items: center; /* Vertically align items in the middle */
+}
+
+.menu-item-image {
+    width: 120px;      /* Fixed width for the image */
+    height: 120px;     /* Fixed height for the image */
+    object-fit: cover; /* This is key: it scales the image to fill the box without stretching it */
+    border-radius: 8px; /* Rounded corners for the image */
+    flex-shrink: 0;    /* Prevents the image from shrinking if the text is long */
+}
+
+.menu-item-details {
+    flex-grow: 1; /* Allows the text content to take up the remaining space */
+}
+
+.menu-item-details h3 {
+    margin-top: 0;
+}
+
+.menu-item-details p {
+    margin-bottom: 15px;
+}
+/* --- New Styles for Accordion --- */
+.accordion-section {
+    margin-top: 20px;
+}
+
+.accordion-item {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden; /* This is important for the collapse animation */
+}
+
+.accordion-header {
+    background-color: #fff;
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+}
+
+.accordion-header:hover {
+    background-color: var(--light-bg);
+}
+
+.accordion-header::after {
+    content: '▼'; /* Downward-pointing arrow */
+    font-size: 0.8em;
+    transition: transform 0.3s ease;
+}
+
+.accordion-header.active::after {
+    transform: rotate(180deg); /* Flip the arrow when active */
+}
+
+.accordion-content {
+    padding: 0 20px; /* Start with no vertical padding */
+    max-height: 0;   /* This is the key to the collapse effect */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* Smooth transition */
+}
+
+.accordion-content p {
+    margin: 0;
+    padding: 15px 0;
+}

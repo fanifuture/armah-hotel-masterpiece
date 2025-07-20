@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abay Cafe - Menu</title>
+    <link rel="stylesheet" href="CSS/STYLE.CSS"> <!-- NOTE: We use /public/... because the server will serve it from there -->
+</head>
+<body>
+    <div class="container">
+        <header style="text-align: center; margin-bottom: 20px;">
+            <h1>Abay Cafe</h1>
+            <p>Welcome to Table <strong id="tableNumberDisplay">Loading...</strong></p>
+        </header>
+
+        <!-- === NEW SEARCH BAR === -->
+        <div class="search-container" style="margin-bottom: 40px;">
+            <input type="text" id="menuSearchInput" placeholder="Search for food or drinks..." style="width: 95%; padding: 15px; font-size: 1.1em; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+        <!-- === END OF NEW SEARCH BAR === -->
+
+        <main id="menuItemsContainer">
+            <h2>Main Dishes</h2>
+            
+            <!-- Added data-name-tg attribute -->
+            <div class="card menu-item" data-name="Doro Wat" data-name-tg="ዶሮ ወጥ" data-price="18.99">
+                <img src="ethiopian-spicy-doro-wot-injera-260nw-746378887.webp" alt="Doro Wat" class="menu-item-image">
+                <div class="menu-item-details">
+                    <h3>Doro Wat / ዶሮ ወጥ <span style="color: var(--primary-color);">$18.99</span></h3>
+                    <p>A rich and spicy chicken stew, slow-cooked with berbere sauce and served with a hard-boiled egg.</p>
+                    <button class="btn add-to-cart-btn">Add to Order</button>
+                </div>
+            </div>
+        
+            <!-- Added data-name-tg attribute -->
+            <div class="card menu-item" data-name="Veggie Combo" data-name-tg="ናይ ኣሕምልቲ በያይነቱ" data-price="17.50">
+                <img src="download.jpeg" alt="Veggie Combo" class="menu-item-image">
+                <div class="menu-item-details">
+                    <h3>Veggie Combo / ናይ ኣሕምልቲ በያይነቱ <span style="color: var(--primary-color);">$17.50</span></h3>
+                    <p>A beautiful platter of various vegetable stews like lentils, chickpeas, and cabbage.</p>
+                    <button class="btn add-to-cart-btn">Add to Order</button>
+                </div>
+            </div>
+        
+            <!-- Added data-name-tg attribute -->
+            <div class="card menu-item" data-name="Kitfo (Special)" data-name-tg="ክትፎ" data-price="20.50">
+                <img src="download (1).jpeg" alt="Kitfo" class="menu-item-image">
+                <div class="menu-item-details">
+                    <h3>Kitfo / ክትፎ <span style="color: var(--primary-color);">$20.50</span></h3>
+                    <p>Minced raw beef, marinated in mitmita (a spicy chili powder) and niter kibbeh (herbed butter).</p>
+                    <button class="btn add-to-cart-btn">Add to Order</button>
+                </div>
+            </div>
+            
+            <h2>Drinks</h2>
+            <!-- Added data-name-tg attribute -->
+            <div class="card menu-item" data-name="St. George Beer" data-name-tg="ቅዱስ ጊዮርጊስ ቢራ" data-price="5.00">
+                <img src="download (2).jpeg" alt="Beer" class="menu-item-image">
+                <div class="menu-item-details">
+                    <h3>St. George Beer / ቅዱስ ጊዮርጊስ ቢራ <span style="color: var(--primary-color);">$5.00</span></h3>
+                    <p>A classic Ethiopian lager, crisp and refreshing.</p>
+                    <button class="btn add-to-cart-btn">Add to Order</button>
+                </div>
+            </div>
+        
+        </main><!-- End of menuItemsContainer -->
+
+        <!-- The Cart Section (Unchanged) -->
+        <div class="card" style="margin-top: 40px; border-top: 4px solid var(--primary-color);">
+            <!-- ... (cart HTML is the same) ... -->
+            <h2>Your Order</h2>
+            <div id="cartItems"></div>
+            <hr>
+            <p><strong>Total: <span id="cartTotal">$0.00</span></strong></p>
+          <!-- Inside the <div class="card" style="margin-top: 40px; ..."> -->
+    <!-- ... Your cart items and total ... -->
+    <hr>
+    <form id="orderForm">
+        <label for="tableCode">Table Code:</label>
+        <input type="password" id="tableCode" placeholder="Code from table" style="width: 95%; padding: 10px; margin-top: 5px; margin-bottom: 15px;">
+        <button type="submit" class="btn" style="width: 100%;">Place Order</button>
+
+        <!-- The OLD buttons have been DELETED -->
+    </form>
+</div> <!-- This closes the cart card -->
+
+<!-- === NEW ACCORDION SECTION === -->
+<div class="accordion-section">
+    <div class="accordion-item">
+        <div class="accordion-header" id="callWaiterHeader">Call Waiter for Assistance</div>
+        <!-- The content for this will be a JavaScript confirmation -->
+    </div>
+    <div class="accordion-item">
+        <div class="accordion-header">Show Wi-Fi Password</div>
+        <div class="accordion-content">
+            <p><strong>Network:</strong> Abay Cafe Free Wi-Fi</p>
+            <p><strong>Password:</strong> EatDrinkEnjoy</p>
+        </div>
+    </div>
+</div>
+<!-- === END OF ACCORDION SECTION === -->
+        </div>
+    </div>
+
+    <!-- Link to our JavaScript file -->
+    <script src="js/menu-client.js"></script>
+</body>
+</html>
