@@ -1,165 +1,145 @@
-// This event listener ensures our code runs only after the entire HTML page has been loaded.
-document.addEventListener("DOMContentLoaded", () => {
-  // --- PART 1: DYNAMIC TABLE NUMBER ---
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomNumber = urlParams.get("room");
+    const tableNumber = urlParams.get("table");
+    const location = roomNumber || tableNumber || "N/A";
+    const locationType = roomNumber ? "room" : "table";
+    let cart = {};
+    let allMenuItems = []; // Store all menu items for searching
 
-  // Create a URLSearchParams object from the current page's URL.
-  // This lets us easily read parameters like '?table=12'.
-  const urlParams = new URLSearchParams(window.location.search);
+    // Get all DOM elements
+    const welcomeMessage = document.getElementById("welcomeMessage");
+    const codeLabel = document.getElementById("codeLabel");
+    const callWaiterBtn = document.getElementById('callWaiterBtn');
+    const searchInput = document.getElementById('searchInput');
+    const menuContainer = document.getElementById('menuContainer');
+    const cartItemsContainer = document.getElementById('cartItems');
+    const cartTotalElement = document.getElementById('cartTotal');
+    const orderForm = document.getElementById('orderForm');
+    const passwordEye = document.getElementById('passwordEye');
+    const codeInput = document.getElementById('code');
 
-  // Get the value of the 'table' parameter from the URL.
-  // If it doesn't exist, default to 'N/A'.
-  const tableNumber = urlParams.get("table") || "N/A";
-
-  // Find the HTML element with the id 'tableNumberDisplay' and update its text.
-  const tableNumberElement = document.getElementById("tableNumberDisplay");
-  if (tableNumberElement) {
-    tableNumberElement.textContent = tableNumber;
-  }
-
-  // --- PART 2: SHOPPING CART LOGIC ---
-
-  // A JavaScript object to store the items in our cart.
-  // e.g., { "Doro Wat": { quantity: 1, price: 18.99 }, ... }
-  const cart = {};
-
-  // Get references to the HTML elements we need to interact with.
-  const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
-  const cartItemsContainer = document.getElementById("cartItems");
-  const cartTotalElement = document.getElementById("cartTotal");
-
-  // Loop through every "Add to Order" button on the page.
-  addToCartButtons.forEach((button) => {
-    // Add a click event listener to each button.
-    button.addEventListener("click", () => {
-      // Find the parent '.menu-item' card of the button that was clicked.
-      const menuItem = button.closest(".menu-item");
-
-      // Get the item's name and price from the data attributes we set in the HTML.
-      const name = menuItem.dataset.name;
-      const price = parseFloat(menuItem.dataset.price);
-
-      // If the item is already in the cart, just increase its quantity.
-      if (cart[name]) {
-        cart[name].quantity++;
-      } else {
-        // Otherwise, add it to the cart for the first time.
-        cart[name] = {
-          quantity: 1,
-          price: price,
-        };
-      }
-
-      // Announce what was added (good for user feedback).
-      console.log(`Added ${name} to cart. Cart is now:`, cart);
-
-      // Update the display to show the new cart contents.
-      updateCartDisplay();
-    });
-  });
-
-  // This function redraws the cart display based on the current state of the 'cart' object.
-  function updateCartDisplay() {
-    // Clear the current display.
-    cartItemsContainer.innerHTML = "";
-
-    let total = 0;
-
-    // Check if the cart is empty.
-    if (Object.keys(cart).length === 0) {
-      cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
-      cartTotalElement.textContent = "$0.00";
-      return;
-    }
-
-    // Loop through each item in the cart object.
-    for (const [name, details] of Object.entries(cart)) {
-      // Create a new paragraph element for each item.
-      const itemElement = document.createElement("p");
-      itemElement.textContent = `${details.quantity}x ${name}`;
-      cartItemsContainer.appendChild(itemElement);
-
-      // Add the item's cost to the total.
-      total += details.quantity * details.price;
-    }
-
-    // Update the total price display, formatted to 2 decimal places.
-    cartTotalElement.textContent = `$${total.toFixed(2)}`;
-  }
-
-  // Initialize the cart display when the page loads.
-  updateCartDisplay();
-});
-// --- PART 1.5: REAL-TIME MENU SEARCH ---
-
-// --- PART 1.5: BILINGUAL REAL-TIME MENU SEARCH ---
-
-const searchInput = document.getElementById('menuSearchInput');
-const allMenuItems = document.querySelectorAll('.menu-item');
-
-if (searchInput) {
-    searchInput.addEventListener('keyup', () => {
-        // Get the search query. We don't convert to lower case here because
-        // Tigrinya script is case-sensitive in its own way.
-        const searchQuery = searchInput.value.trim();
-
-        // If the search bar is empty, show all items and stop.
-        if (searchQuery === "") {
-            allMenuItems.forEach(item => {
-                item.style.display = 'flex';
-            });
-            return; // Exit the function early
-        }
-
-        allMenuItems.forEach(item => {
-            // Get both the English and Tigrinya names from the data attributes.
-            const englishName = item.dataset.name.toLowerCase(); // English can be lowercased
-            const tigrinyaName = item.dataset.nameTg; // Keep Tigrinya as is
-
-            // Check if either the English name (in lowercase) contains the lowercase search query
-            // OR if the Tigrinya name contains the search query as-is.
-            if (englishName.includes(searchQuery.toLowerCase()) || tigrinyaName.includes(searchQuery)) {
-                // If there's a match in EITHER language, show the item.
-                item.style.display = 'flex';
-            } else {
-                // If no match in either language, hide the item.
-                item.style.display = 'none';
-            }
-        });
-    });
-}
-// --- PART 3: CALL WAITER FUNCTIONALITY ---
-
-// --- PART 3 & 4 Combined: ACCORDION FOR SERVICES ---
-
-const accordionHeaders = document.querySelectorAll('.accordion-header');
-
-accordionHeaders.forEach(header => {
-    header.addEventListener('click', () => {
-        // First, handle the special case for the "Call Waiter" button
-        if (header.id === 'callWaiterHeader') {
-            if (confirm("Are you sure you want to call a waiter to your table?")) {
-                alert(`A waiter has been notified and will be with you shortly at Table ${tableNumber}.`);
-                // Note: We don't need to disable this visually since it doesn't stay "open".
-                // The real spam prevention will be on the server side.
-            }
-            return; // Stop the function here so it doesn't try to open/close
-        }
-
-        // For all other accordion items (like Wi-Fi)
-        const content = header.nextElementSibling;
-        
-        // Toggle the 'active' class on the header (for the arrow)
-        header.classList.toggle('active');
-
-        // Check if the content is open or closed
-        if (content.style.maxHeight) {
-            // If it has a maxHeight, it's open. Close it.
-            content.style.maxHeight = null;
-            content.style.padding = '0 20px'; // Animate padding out
+    function setupUIForLocation() {
+        if (locationType === 'room') {
+            welcomeMessage.innerHTML = `Welcome, Room ${location} / እንኳን ደህና መጡ, ክፍል ${location}`;
+            codeLabel.textContent = "Room Code / የክፍል ኮድ";
         } else {
-            // If it's closed, open it.
-            content.style.padding = '0 20px 15px 20px'; // Animate padding in
-            content.style.maxHeight = content.scrollHeight + "px"; // Set max-height to its natural full height
+            welcomeMessage.innerHTML = `Welcome, Table ${location} / እንኳን ደህና መጡ, ጠረጴዛ ${location}`;
+            codeLabel.textContent = "Table Code / የጠረጴዛ ኮድ";
+            callWaiterBtn.style.display = 'block'; // Only show for tables
+        }
+    }
+
+    async function loadMenu() {
+        try {
+            allMenuItems = await (await fetch('/api/menu')).json();
+            renderMenu(allMenuItems); // Initial render of all items
+        } catch (error) { 
+            menuContainer.innerHTML = '<p>Could not load menu. Please try again later.</p>'; 
+        }
+    }
+    
+    function renderMenu(items) {
+        menuContainer.innerHTML = "";
+        let currentCategory = "";
+        if (items.length === 0) {
+            menuContainer.innerHTML = '<p style="text-align: center;">No items match your search.</p>';
+            return;
+        }
+        items.forEach(item => {
+            if (item.category !== currentCategory) {
+                currentCategory = item.category;
+                const categoryHeader = document.createElement("h2");
+                categoryHeader.textContent = currentCategory;
+                menuContainer.appendChild(categoryHeader);
+            }
+            const itemCard = document.createElement("div");
+            itemCard.className = `card menu-item ${!item.isAvailable ? 'unavailable' : ''}`;
+            itemCard.dataset.name = item.name;
+            itemCard.dataset.price = item.price;
+
+            itemCard.innerHTML = `
+                <img src="${item.image}" alt="${item.name}" class="menu-item-image" />
+                <div class="menu-item-details">
+                    <h3>${item.name} <span class="amharic-name">${item.name_am || ''}</span></h3>
+                    <p>${item.description}<br><em>${item.description_am || ''}</em></p>
+                    <p><strong>$${parseFloat(item.price).toFixed(2)}</strong></p>
+                    <button class="btn add-to-cart-btn">
+                        ${!item.isAvailable ? 'Not Available / አይገኝም' : 'Add to Order / ወደ ጋሪ הוסף'}
+                    </button>
+                </div>`;
+
+            if (!item.isAvailable) itemCard.querySelector('button').disabled = true;
+            menuContainer.appendChild(itemCard);
+        });
+    }
+    
+    menuContainer.addEventListener('click', e => {
+        if (e.target && e.target.classList.contains('add-to-cart-btn')) {
+            const card = e.target.closest('.menu-item');
+            const { name, price } = card.dataset;
+            
+            if (cart[name]) {
+                cart[name].quantity++;
+            } else {
+                cart[name] = { quantity: 1, price: parseFloat(price) };
+            }
+            updateCartDisplay();
         }
     });
+
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filteredItems = allMenuItems.filter(item => 
+            (item.name && item.name.toLowerCase().includes(searchTerm)) || 
+            (item.name_am && item.name_am.includes(searchTerm))
+        );
+        renderMenu(filteredItems);
+    });
+
+    function updateCartDisplay() {
+        if (Object.keys(cart).length === 0) { 
+            cartItemsContainer.innerHTML = "<p>Your cart is empty. / ጋሪዎ ባዶ ነው።</p>"; 
+        } else { 
+            const ul = document.createElement('ul'); 
+            for (const [name, details] of Object.entries(cart)) { 
+                const li = document.createElement("li"); 
+                li.style.marginBottom = '5px';
+                li.textContent = `${details.quantity}x ${name}`; 
+                ul.appendChild(li); 
+            } 
+            cartItemsContainer.innerHTML = ''; 
+            cartItemsContainer.appendChild(ul); 
+        }
+        let total = 0;
+        for (const details of Object.values(cart)) { total += details.quantity * details.price; }
+        cartTotalElement.textContent = `$${parseFloat(total).toFixed(2)}`;
+    }
+
+    orderForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (Object.keys(cart).length === 0) return alert("Your cart is empty! / ጋሪዎ ባዶ ነው!");
+        const orderData = { items: cart, code: codeInput.value };
+        orderData[locationType] = location;
+        try {
+            const response = await fetch("/place-order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(orderData) });
+            const result = await response.json();
+            alert(result.message);
+            if (result.success) { cart = {}; codeInput.value = ""; updateCartDisplay(); }
+        } catch (error) { alert("Could not connect to the server."); }
+    });
+    
+    callWaiterBtn.addEventListener('click', async () => {
+        if (!confirm('Call a waiter to this table? / ወደዚህ ጠረጴዛ አስተናጋጅ መጥራት ይፈልጋሉ?')) return;
+        try {
+            await fetch('/call-waiter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ table: location }) });
+            alert('A waiter has been notified. / አስተናጋጁ እንዲያውቅ ተደርጓል።');
+        } catch(e) { alert('Could not send signal. / ምልክቱን መላክ አልተቻለም።'); }
+    });
+
+    passwordEye.addEventListener('click', () => { const isPassword = codeInput.type === 'password'; codeInput.type = isPassword ? 'text' : 'password'; passwordEye.classList.toggle('bi-eye'); passwordEye.classList.toggle('bi-eye-slash'); });
+
+    setupUIForLocation();
+    loadMenu();
+    updateCartDisplay();
 });

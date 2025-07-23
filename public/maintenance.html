@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Maintenance & Service Dashboard</title>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        #sound-enabler { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); color: white; display: flex; justify-content: center; align-items: center; text-align: center; z-index: 9999; cursor: pointer; }
+        #sound-enabler h1 { color: white; }
+    </style>
+</head>
+<body class="dashboard-body">
+    <div id="sound-enabler">
+        <div>
+            <h1>Armah Hotel - Maintenance Dashboard</h1>
+            <p>Click anywhere to start and enable sound notifications.</p>
+        </div>
+    </div>
+    <header style="background-color: var(--primary-color); color: white; padding: 15px 20px; text-align: center;"><h1 style="color: var(--secondary-color); margin: 0;">Live Service Requests</h1></header>
+    <div id="requestsContainer" class="dashboard-container"><p style="width: 100%; text-align: center; font-size: 1.5em; color: #eee;">Waiting for new service requests...</p></div>
+    <audio id="notificationSound" src="sounds/notification.mp3" preload="auto"></audio>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const container = document.getElementById('requestsContainer');
+        const sound = document.getElementById('notificationSound');
+        const soundEnabler = document.getElementById('sound-enabler');
+
+        soundEnabler.addEventListener('click', () => {
+            sound.play().catch(e => {});
+            sound.pause();
+            soundEnabler.style.display = 'none';
+            socket.emit('maintenance_dashboard_ready');
+            socket.on('new_service_request', createRequestCard);
+        }, { once: true });
+
+        function createRequestCard(data) {
+            if (document.querySelector(`[data-id="${data.id}"]`)) return;
+            container.querySelector('p')?.remove();
+            sound.play().catch(e => {});
+            const card = document.createElement('div');
+            card.className = 'card dashboard-card new-order-table';
+            card.dataset.id = data.id;
+            card.innerHTML = `<h2>Room ${data.room}</h2><p style="font-size: 1.3em;">${data.request}<br><small>${data.request_am}</small></p><small>Received: ${new Date(data.timestamp).toLocaleTimeString()}</small><hr><button class="btn" onclick="completeRequest(this)">Mark as Done</button>`;
+            container.prepend(card);
+        };
+
+        async function completeRequest(btn) {
+            const card = btn.closest('.dashboard-card');
+            const requestId = card.dataset.id;
+            btn.disabled = true;
+            try {
+                await fetch('/acknowledge-service', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: parseInt(requestId) }) });
+            } catch (e) { console.error("Could not acknowledge service."); }
+            card.classList.add('completed');
+            btn.style.backgroundColor = 'var(--success-color)';
+            btn.textContent = 'Done!';
+            setTimeout(() => card.remove(), 2000);
+        }
+    </script>
+</body>
+</html>

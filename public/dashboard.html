@@ -1,45 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Dashboard</title>
-    <link rel="stylesheet" href="public/css/style.css">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Kitchen & Bar Dashboard</title>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body style="background-color: #e9ecef;">
-    <header style="background-color: var(--primary-color); color: white; padding: 20px; text-align: center;">
-        <h1 style="color: var(--secondary-color); margin: 0;">Live Orders</h1>
-    </header>
-
-    <div class="container" style="display: flex; flex-wrap: wrap; gap: 20px; max-width: 1200px;">
-        <!-- New Order Example -->
-        <div class="card order-card" style="flex-basis: 300px; border-left: 5px solid var(--secondary-color);">
-            <h2>Table 12 <span style="font-size: 0.7em; color: #666;">(New)</span></h2>
-            <p><strong>Time:</strong> 7:32 PM</p>
-            <ul>
-                <li>2x Doro Wat</li>
-                <li>1x Veggie Combo</li>
-                <li>3x St. George Beer</li>
-            </ul>
-            <button class="btn" style="width: 100%;">Acknowledge Order</button>
-            <!-- Temporary "Help Request" Card Example -->
-<div class="card order-card" style="flex-basis: 300px; border-left: 5px solid #dc3545; background-color: #fff0f1;">
-    <h2>ASSISTANCE REQUEST</h2>
-    <p style="font-size: 2em; font-weight: bold; text-align: center; margin: 20px 0;">Table 9</p>
-    <p><strong>Time:</strong> 7:45 PM</p>
-    <button class="btn" style="width: 100%; background-color: #28a745;">Mark as Resolved</button>
-</div>
-        </div>
-
-        <!-- Acknowledged Order Example -->
-        <div class="card order-card" style="flex-basis: 300px;">
-            <h2>Table 7</h2>
-            <p><strong>Time:</strong> 7:28 PM</p>
-            <ul>
-                <li>1x Kitfo</li>
-            </ul>
-            <button class="btn" style="background-color: #6c757d; width: 100%;">Mark as Completed</button>
+<body class="dashboard-body">
+    <div id="sound-enabler">
+        <div>
+            <h1>Armah Hotel - Kitchen Dashboard</h1>
+            <p>Click anywhere to start and enable sound notifications.</p>
         </div>
     </div>
+    <header style="background-color: var(--primary-color); color: white; padding: 15px 20px; text-align: center;"><h1 style="color: var(--secondary-color); margin: 0;">Kitchen & Bar Dashboard</h1></header>
+    <div id="ordersContainer" class="dashboard-container"><p style="width: 100%; text-align: center; font-size: 1.5em; color: #eee;">Waiting for activity...</p></div>
+    
+    <audio id="roomOrderSound" src="sounds/notification.mp3" preload="auto"></audio>
+    <!-- === THIS IS THE MASTER FIX FOR THE SOUND === -->
+    <!-- The filename is case-sensitive and must be exact. -->
+    <audio id="tableOrderSound" src="sounds/Notification-2.mp3" preload="auto"></audio>
+    <audio id="waiterCallSound" src="sounds/Notification-2.mp3" preload="auto"></audio>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const container = document.getElementById('ordersContainer');
+        const soundEnabler = document.getElementById('sound-enabler');
+        const sounds = { 
+            room: document.getElementById('roomOrderSound'), 
+            table: document.getElementById('tableOrderSound'), 
+            call: document.getElementById('waiterCallSound') 
+        };
+
+        soundEnabler.addEventListener('click', () => {
+            Object.values(sounds).forEach(sound => { sound.play(); sound.pause(); });
+            soundEnabler.style.display = 'none';
+            socket.emit('kitchen_dashboard_ready');
+            socket.on('new_order', (orderData) => createCard(orderData, 'order'));
+            socket.on('new_waiter_call', (callData) => createCard(callData, 'call'));
+        }, { once: true });
+
+        const createCard = (data, type) => {
+            if (document.querySelector(`[data-id="${data.id}"]`)) return;
+            container.querySelector('p')?.remove();
+            
+            const card = document.createElement('div');
+            card.dataset.id = data.id || `call-${data.table}`;
+            let itemsHtml = '', cardClass = '', headerText = '', cardBody = '', cardFooter = '';
+
+            if(type === 'order') {
+                itemsHtml = '<ul>' + Object.entries(data.items).map(([name, deets]) => `<li>${deets.quantity}x ${name}</li>`).join('') + '</ul>';
+                cardClass = data.locationType === 'Room' ? 'new-order-room' : 'new-order-table';
+                headerText = `${data.locationType} ${data.location}`;
+                cardBody = `<p><strong>Total:</strong> $${data.total.toFixed(2)}</p>${itemsHtml}`;
+                cardFooter = `<button class="btn" onclick="acknowledgeOrder(this)">Complete & Save Sale</button>`;
+                sounds[data.locationType === 'Room' ? 'room' : 'table'].play().catch(e => {});
+                card.dataset.location = data.location;
+            } else { // Waiter Call
+                cardClass = 'new-waiter-call';
+                headerText = `Waiter Call - Table ${data.table}`;
+                cardBody = `<p style="font-size: 1.5rem; text-align: center; color: var(--danger-color); margin: 20px 0;">Needs Assistance!</p>`;
+                cardFooter = `<button class="btn" style="background-color: var(--danger-color);" onclick="this.closest('.dashboard-card').remove()">Acknowledge</button>`;
+                sounds.call.play().catch(e => {});
+            }
+            card.className = `card dashboard-card ${cardClass}`;
+            card.innerHTML = `<h2>${headerText} <span class="status">(New)</span></h2> ${cardBody} ${cardFooter}`;
+            container.prepend(card);
+        };
+        
+        async function acknowledgeOrder(btn) {
+            const card = btn.closest('.dashboard-card');
+            btn.disabled = true; btn.textContent = 'Saving...';
+            try {
+                const response = await fetch('/acknowledge-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: card.dataset.location }) });
+                if (!response.ok) throw new Error('Server failed');
+                card.className = 'card dashboard-card completed';
+                card.querySelector('h2 .status').textContent = '(Completed & Saved)';
+                btn.style.backgroundColor = 'var(--success-color)'; btn.textContent = 'Done!';
+            } catch (error) { alert('Error: Could not complete order.'); btn.disabled = false; btn.textContent = 'Complete & Save Sale'; }
+        }
+    </script>
 </body>
 </html>

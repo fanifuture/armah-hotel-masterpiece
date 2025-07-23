@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "category": "Main Dishes",
+    "name": "Doro Wat",
+    "name_am": "ዶሮ ወጥ",
+    "description": "A rich and spicy chicken stew, slow-cooked with berbere sauce and served with a hard-boiled egg.",
+    "description_am": "በበርበሬ መረቅ የበሰለ እና በእንቁላል የቀረበ የበለጸገና ቅመም የበዛበት የዶሮ ወጥ።",
+    "price": 250,
+    "image": "uploads/1.jpg",
+    "isAvailable": true
+  },
+  {
+    "id": 2,
+    "category": "Main Dishes",
+    "name": "Veggie Combo",
+    "name_am": "የአትክልት በያይነቱ",
+    "description": "A beautiful platter of various vegetable stews like lentils, chickpeas, and cabbage.",
+    "description_am": "እንደ ምስር፣ ሽምብራ እና ጎመን ያሉ የተለያዩ የአትክልት ወጦች የሚያምር ስብስብ።",
+    "price": 220,
+    "image": "uploads/2.jpg",
+    "isAvailable": true
+  },
+  {
+    "id": 3,
+    "category": "Main Dishes",
+    "name": "Kitfo",
+    "name_am": "ክትፎ",
+    "description": "Minced raw beef, marinated in mitmita (a spicy chili powder) and niter kibbeh (herbed butter).",
+    "description_am": "በሚጥሚጣ እና በንጥር ቅቤ የተቀመመ ጥሬ የተፈጨ የበሬ ሥጋ።",
+    "price": 280,
+    "image": "uploads/3.jpg",
+    "isAvailable": true
+  },
+  {
+    "id": 4,
+    "category": "Drinks",
+    "name": "St. George Beer",
+    "name_am": "ቅዱስ ጊዮርጊስ ቢራ",
+    "description": "A classic Ethiopian lager, crisp and refreshing.",
+    "description_am": "ንጹህና የሚያድስ የኢትዮጵያ ላገር ቢራ።",
+    "price": 50,
+    "image": "uploads/4.jpg",
+    "isAvailable": true
+  },
+  {
+    "id": 6,
+    "name": "Water",
+    "name_am": "ውሃ",
+    "category": "Drinks",
+    "description": "Bottled highland spring water.",
+    "description_am": "ከፍተኛ ቦታ የታሸገ ምንጭ ውሃ።",
+    "price": 30,
+    "image": "uploads/6.png",
+    "isAvailable": true
+  },
+  {
+    "id": 1753243956082,
+    "name": "APEX",
+    "name_am": "ቸፈ",
+    "category": "Drinks",
+    "description": "ሰረየደቱፈዪ",
+    "description_am": "ሌሰረየደቱፈዪጉ",
+    "price": 25,
+    "image": "uploads/1753243955040.JPG",
+    "isAvailable": true
+  }
+]

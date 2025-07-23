@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><title>Service Request</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .service-container { max-width: 700px; }
+        .service-header { text-align: center; margin-bottom: 30px; }
+        .service-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .service-option { background-color: white; padding: 20px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .service-option:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+        .service-option i { font-size: 2.5rem; color: var(--primary-color); }
+        .service-option h3 { margin: 10px 0 0; font-size: 1.1rem; }
+    </style>
+</head>
+<body style="background-color: #e9ecef;">
+    <div class="container service-container">
+        <header class="service-header">
+            <h1>Service Request for Room <span id="roomNumberDisplay">...</span></h1>
+            <p>Tap an option below to send an alert to our staff.</p>
+        </header>
+        <main id="serviceOptionsContainer" class="service-options"></main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomNumber = urlParams.get('room') || 'N/A';
+            document.getElementById('roomNumberDisplay').textContent = roomNumber;
+
+            async function loadServices() {
+                const container = document.getElementById('serviceOptionsContainer');
+                try {
+                    const response = await fetch('/api/services');
+                    const services = await response.json();
+                    services.forEach(service => {
+                        const serviceBtn = document.createElement('div');
+                        serviceBtn.className = 'service-option';
+                        serviceBtn.innerHTML = `<i class="bi ${service.icon}"></i><h3>${service.name}</h3>`;
+                        if (service.id !== 'other') {
+                            serviceBtn.addEventListener('click', () => sendServiceRequest(roomNumber, service.name));
+                        }
+                        container.appendChild(serviceBtn);
+                    });
+                } catch (e) { container.innerHTML = '<p>Could not load services.</p>'; }
+            }
+
+            async function sendServiceRequest(room, request) {
+                if (!confirm(`Confirm request for "${request}" for Room ${room}?`)) return;
+                try {
+                    const response = await fetch('/service-request', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ room, request })
+                    });
+                    if (!response.ok) throw new Error('Server error');
+                    alert('Your request has been sent! Staff will be with you shortly.');
+                } catch (e) { alert('Could not send request. Please call the front desk.'); }
+            }
+            loadServices();
+        });
+    </script>
+</body>
+</html>

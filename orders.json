@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1753259557599,
+    "location": "1",
+    "locationType": "Table",
+    "items": {
+      "APEX": {
+        "quantity": 1,
+        "price": 25
+      }
+    },
+    "total": 25,
+    "timestamp": "2025-07-23T08:32:37.599Z"
+  }
+]

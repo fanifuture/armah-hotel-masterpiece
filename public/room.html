@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><title>Armah Hotel - Guest Services</title>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body style="background-color: #e9ecef;">
+    <div class="container portal-container">
+        <header class="main-header">
+            <img src="/logo.png" alt="Armah International Hotel Logo" class="logo">
+            <h1>Welcome / እንኳን ደህና መጡ</h1>
+            <p>Room <span id="roomNumberDisplay">...</span></p>
+        </header>
+        <main class="service-options">
+            <a id="foodLink" href="#" class="portal-option">
+                <i class="bi bi-egg-fried"></i>
+                <div>
+                    <h2>Room Service</h2>
+                    <p>የክፍል አገልግሎት</p>
+                </div>
+            </a>
+            <a id="serviceLink" href="#" class="portal-option">
+                <i class="bi bi-tools"></i>
+                <div>
+                    <h2>Guest Services</h2>
+                    <p>የእንግዳ አገልግሎቶች</p>
+                </div>
+            </a>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const roomNumber = new URLSearchParams(window.location.search).get('room') || 'N/A';
+            document.getElementById('roomNumberDisplay').textContent = roomNumber;
+            // This script correctly links to the other pages
+            document.getElementById('foodLink').href = `/index.html?room=${roomNumber}`;
+            document.getElementById('serviceLink').href = `/services.html?room=${roomNumber}`;
+        });
+    </script>
+</body>
+</html>

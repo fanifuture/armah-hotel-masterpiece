@@ -1,0 +1,38 @@
+[
+  {
+    "id": "towels",
+    "name": "Request Fresh Towels",
+    "name_am": "ንጹህ ፎጣ ይጠይቁ",
+    "icon": "bi-stack"
+  },
+  {
+    "id": "water",
+    "name": "Report Water Problem",
+    "name_am": "የውሃ ችግር ሪፖርት ያድርጉ",
+    "icon": "bi-droplet-fill"
+  },
+  {
+    "id": "lights",
+    "name": "Report Lighting Issue",
+    "name_am": "የመብራት ችግር ሪፖርት ያድርጉ",
+    "icon": "bi-lightbulb-off-fill"
+  },
+  {
+    "id": "housekeeping",
+    "name": "Request Housekeeping",
+    "name_am": "የጽዳት አገልግሎት ይጠይቁ",
+    "icon": "bi-trash-fill"
+  },
+  {
+    "id": "internet",
+    "name": "Report Internet Issue",
+    "name_am": "የበይነመረብ ችግር ሪፖርት ያድርጉ",
+    "icon": "bi-wifi-off"
+  },
+  {
+    "id": "other",
+    "name": "Other Request",
+    "name_am": "ሌላ ጥያቄ",
+    "icon": "bi-telephone-fill"
+  }
+]

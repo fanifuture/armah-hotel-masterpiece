@@ -1,38 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-    <link rel="stylesheet" href="public/css/style.css">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Armah Hotel - Admin Panel</title>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .sales-controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .sales-controls .form-group { flex-grow: 1; }
+        .btn-danger { background-color: var(--danger-color); } .btn-danger:hover { background-color: #b02a37; }
+        .sales-summary { display: flex; justify-content: space-around; background-color: var(--light-bg); padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px; }
+        .summary-box h4 { margin: 0 0 5px; color: #777; font-weight: 400; } .summary-box p { margin: 0; font-size: 1.8rem; font-weight: 600; color: var(--primary-color); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 30px; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 12px; }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
-<body style="background-color: #e9ecef;">
-    <header style="background-color: var(--primary-color); color: white; padding: 20px; text-align: center;">
-        <h1 style="color: var(--secondary-color); margin: 0;">Abay Cafe - Admin Panel</h1>
-    </header>
-
-    <div class="container">
-        <!-- Login Form Card -->
-        <div class="card">
-            <h2>Admin Login</h2>
-            <form>
-                <label for="email">Email:</label>
-                <input type="email" id="email" required style="width: 95%; padding: 10px; margin-top: 5px; margin-bottom: 15px;">
-                <label for="password">Password:</label>
-                <input type="password" id="password" required style="width: 95%; padding: 10px; margin-top: 5px; margin-bottom: 15px;">
-                <button type="submit" class="btn">Login</button>
-            </form>
-        </div>
-
-        <!-- Menu Editor Card (Example of what they see after login) -->
-        <div class="card">
-            <h2>Menu Editor</h2>
-            <p><strong>Current Item:</strong> Doro Wat - $18.99</p>
-            <button class="btn" style="background-color: #17a2b8;">Edit</button>
-            <button class="btn" style="background-color: #dc3545;">Delete</button>
-            <hr style="margin: 20px 0;">
-            <button class="btn" style="width: 100%; background-color: var(--primary-color); color: white;">+ Add New Menu Item</button>
+<body id="adminBody">
+    <div id="loginContainer" class="login-body">
+        <div class="container login-container">
+            <header class="main-header"><img src="/logo.png" alt="Armah International Hotel Logo" class="logo"><h1>Admin Panel</h1></header>
+            <div id="loginSection" class="card">
+                <h2>Admin Login</h2>
+                <form id="loginForm">
+                    <div class="form-group"><label for="username">Email:</label><input type="email" id="username" required></div>
+                    <div class="form-group" style="margin-top: 15px;"><label for="password">Password:</label><div class="password-container"><input type="password" id="password" required style="width: 100%"><i class="bi bi-eye-slash" id="loginPasswordEye"></i></div></div>
+                    <button type="submit" class="btn" style="width: 100%; margin-top: 20px;">Login</button>
+                </form>
+            </div>
         </div>
     </div>
+    <div id="adminDashboard" style="display: none;">
+        <header class="main-header"><img src="/logo.png" alt="Armah International Hotel Logo" class="logo"><h1>Admin Panel</h1></header>
+        <div class="container">
+            <div class="nav-tabs"><div class="nav-tab active" data-tab="menu">Menu Editor</div><div class="nav-tab" data-tab="sales">Sales History</div></div>
+            <div id="menuTab" class="tab-content active card">
+                <div id="menuEditorContainer"><p>Loading menu...</p></div> <hr>
+                <button id="showAddFormBtn" class="btn" style="width: 100%;">+ Add New Item</button>
+                <form id="addItemForm" class="form-section" style="display: none;"></form>
+            </div>
+            <div id="salesTab" class="tab-content card">
+                <h2>Sales History</h2>
+                <div class="sales-controls">
+                    <div class="form-group"><label for="salesDate">View Report For:</label><input type="date" id="salesDate"></div>
+                    <button id="viewMonthBtn" class="btn">View Month</button>
+                    <button id="viewYearBtn" class="btn">View Year</button>
+                </div>
+                <div class="sales-summary">
+                    <div class="summary-box"><h4>Daily Total</h4><p id="dailyTotal">$0.00</p></div>
+                    <div class="summary-box"><h4>Monthly Total</h4><p id="monthlyTotal">$0.00</p></div>
+                    <div class="summary-box"><h4>Yearly Total</h4><p id="yearlyTotal">$0.00</p></div>
+                </div>
+                <hr>
+                <div id="salesDataContainer"></div>
+                <h3 style="text-align: right; margin-top: 20px;">Report Total: <span id="reportTotal">$0.00</span></h3>
+                <hr>
+                <!-- NEW: Simplified Clear History Button -->
+                <div class="sales-controls" style="justify-content: flex-end;">
+                    <button id="clearAllHistoryBtn" class="btn btn-danger">Clear All Sales History</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="editModal" class="modal"><div class="modal-content"><span id="closeEditModalBtn" class="close-btn">×</span><form id="editItemForm" class="form-section"></form></div></div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const get = id => document.getElementById(id); // Helper
+        // Get all elements
+        const loginContainer = get('loginContainer'), adminBody = get('adminBody'), adminDashboard = get('adminDashboard'), menuEditorContainer = get('menuEditorContainer');
+        const showAddFormBtn = get('showAddFormBtn'), addItemForm = get('addItemForm'), editModal = get('editModal'), editItemForm = get('editItemForm');
+        const closeEditModalBtn = get('closeEditModalBtn'), loginPasswordEye = get('loginPasswordEye'), passwordInput = get('password'), usernameInput = get('username');
+        const salesDateInput = get('salesDate'), salesDataContainer = get('salesDataContainer'), reportTotalEl = get('reportTotal');
+        const dailyTotalEl = get('dailyTotal'), monthlyTotalEl = get('monthlyTotal'), yearlyTotalEl = get('yearlyTotal');
+        const viewMonthBtn = get('viewMonthBtn'), viewYearBtn = get('viewYearBtn'), clearAllHistoryBtn = get('clearAllHistoryBtn');
+        
+        // --- Event Listeners ---
+        loginPasswordEye.addEventListener('click', () => { const isPassword = passwordInput.type === 'password'; passwordInput.type = isPassword ? 'text' : 'password'; loginPasswordEye.classList.toggle('bi-eye'); loginPasswordEye.classList.toggle('bi-eye-slash'); });
+        get('loginForm').addEventListener('submit', handleLogin);
+        showAddFormBtn.addEventListener('click', () => { addItemForm.style.display = addItemForm.style.display === 'none' ? 'block' : 'none'; });
+        addItemForm.addEventListener('submit', handleAddItem);
+        editItemForm.addEventListener('submit', handleEditItem);
+        closeEditModalBtn.addEventListener('click', () => { editModal.style.display = 'none'; });
+        window.addEventListener('click', e => { if (e.target == editModal) editModal.style.display = 'none'; });
+        document.querySelectorAll('.nav-tab').forEach(tab => tab.addEventListener('click', (e) => { document.querySelector('.nav-tab.active').classList.remove('active'); document.querySelector('.tab-content.active').classList.remove('active'); e.target.classList.add('active'); get(e.target.dataset.tab + 'Tab').classList.add('active'); }));
+        salesDateInput.addEventListener('change', () => { loadAllSalesTotals(salesDateInput.value); });
+        viewMonthBtn.addEventListener('click', () => loadSalesData('month', salesDateInput.value));
+        viewYearBtn.addEventListener('click', () => loadSalesData('year', salesDateInput.value));
+        clearAllHistoryBtn.addEventListener('click', handleClearAllHistory);
+
+        // Setup Add Item Form
+        addItemForm.innerHTML = `<h3>Add a New Menu Item</h3><div class="form-grid"><div class="form-group"><label>Name (English)</label><input type="text" name="name" required></div><div class="form-group"><label>Name (Amharic)</label><input type="text" name="name_am" required></div><div class="form-group"><label>Category</label><input type="text" name="category" required></div><div class="form-group"><label>Price</label><input type="number" name="price" step="0.01" required></div><div class="form-group full-width"><label>Description (English)</label><textarea name="description" rows="2" required></textarea></div><div class="form-group full-width"><label>Description (Amharic)</label><textarea name="description_am" rows="2" required></textarea></div><div id="drop-zone" class="form-group full-width"><p>Drag & Drop image here or click</p><input type="file" id="newItemImage" name="image" accept="image/*" required style="display: none;"></div></div><button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Save New Item</button>`;
+        get('drop-zone').addEventListener('click', () => get('newItemImage').click());
+        get('drop-zone').addEventListener('dragover', e => { e.preventDefault(); get('drop-zone').classList.add('dragover'); });
+        get('drop-zone').addEventListener('dragleave', () => get('drop-zone').classList.remove('dragover'));
+        get('drop-zone').addEventListener('drop', e => { e.preventDefault(); get('drop-zone').classList.remove('dragover'); if (e.dataTransfer.files.length) { get('newItemImage').files = e.dataTransfer.files; get('drop-zone').querySelector('p').textContent = e.dataTransfer.files[0].name; } });
+        
+        // --- Core Functions ---
+        async function handleLogin(e) { e.preventDefault(); try { const response = await fetch('/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: usernameInput.value, password: passwordInput.value }) }); if (!response.ok) throw new Error((await response.json()).message); loginContainer.style.display = 'none'; adminDashboard.style.display = 'block'; adminBody.classList.remove('login-body'); salesDateInput.valueAsDate = new Date(); loadMenuEditor(); loadAllSalesTotals(salesDateInput.value); } catch (err) { alert(`Login Failed: ${err.message}`); } }
+        async function loadMenuEditor() { try { const menuItems = await (await fetch('/api/menu')).json(); menuEditorContainer.innerHTML = ''; menuItems.forEach(item => { const itemDiv = document.createElement('div'); itemDiv.className = 'editor-item'; itemDiv.innerHTML = `<div class="editor-item-info"><strong>${item.name}</strong><br><small>${item.name_am}</small></div><div class="editor-item-actions"><div class="availability-toggle"><label class="toggle-switch"><input type="checkbox" data-id="${item.id}" ${item.isAvailable ? 'checked' : ''}><span class="slider"></span></label></div><button class="btn btn-edit" data-id="${item.id}">Edit</button><button class="btn btn-delete" data-id="${item.id}" data-name="${item.name}">Delete</button></div>`; menuEditorContainer.appendChild(itemDiv); }); menuEditorContainer.querySelectorAll('.availability-checkbox').forEach(c => c.addEventListener('change', e => updateAvailability(parseInt(e.target.dataset.id), e.target.checked))); menuEditorContainer.querySelectorAll('.btn-edit').forEach(b => b.addEventListener('click', e => openEditModal(parseInt(e.target.dataset.id)))); menuEditorContainer.querySelectorAll('.btn-delete').forEach(b => b.addEventListener('click', e => handleDeleteItem(parseInt(e.target.dataset.id), e.target.dataset.name))); } catch (error) { menuEditorContainer.innerHTML = `<p>Error: ${error.message}</p>`; } }
+        async function openEditModal(id) { try { const menuItems = await (await fetch('/api/menu')).json(); const item = menuItems.find(i => i.id == id); if (!item) return; editItemForm.innerHTML = `<h3>Edit Menu Item</h3><input type="hidden" name="id" value="${item.id}"><div class="form-grid"><div class="form-group"><label>Name (English)</label><input type="text" name="name" value="${item.name}" required></div><div class="form-group"><label>Name (Amharic)</label><input type="text" name="name_am" value="${item.name_am}" required></div><div class="form-group"><label>Category</label><input type="text" name="category" value="${item.category}" required></div><div class="form-group"><label>Price</label><input type="number" name="price" step="0.01" value="${item.price}" required></div><div class="form-group full-width"><label>Description (English)</label><textarea name="description" rows="2" required>${item.description}</textarea></div><div class="form-group full-width"><label>Description (Amharic)</label><textarea name="description_am" rows="2" required>${item.description_am}</textarea></div></div><button type="submit" class="btn">Save Changes</button>`; editModal.style.display = 'block'; } catch (error) { alert('Could not fetch item details.'); } }
+        async function updateAvailability(id, status) { try { await fetch('/api/menu/availability', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, isAvailable: status }) }); } catch (error) { alert(`Error: Could not update status.`); loadMenuEditor(); } }
+        async function handleAddItem(e) { e.preventDefault(); const formData = new FormData(addItemForm); if (!formData.get('image').name) return alert('Image is required.'); try { const response = await fetch('/api/menu/add', { method: 'POST', body: formData }); const result = await response.json(); if (result.success) { alert('Item added!'); addItemForm.reset(); get('drop-zone').querySelector('p').textContent = 'Drag & Drop...'; addItemForm.style.display = 'none'; loadMenuEditor(); } else { throw new Error(result.message); } } catch (error) { alert(`Error: ${error.message}`); } }
+        async function handleEditItem(e) { e.preventDefault(); const itemData = Object.fromEntries(new FormData(e.target).entries()); try { const response = await fetch('/api/menu/edit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(itemData) }); const result = await response.json(); if (result.success) { alert('Item updated!'); editModal.style.display = 'none'; loadMenuEditor(); } else { throw new Error(result.message); } } catch (error) { alert(`Error: ${error.message}`); } }
+        async function handleDeleteItem(id, name) { if (!confirm(`Are you sure you want to delete "${name}"?`)) return; try { await fetch('/api/menu/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }); alert('Item deleted.'); loadMenuEditor(); } catch (error) { alert(`Error deleting item.`); } }
+        async function loadSalesData(period, date) { try { const orders = await (await fetch(`/api/sales?period=${period}&date=${date}`)).json(); salesDataContainer.innerHTML = ''; let reportTotal = 0; if (orders.length === 0) { salesDataContainer.innerHTML = '<p>No sales recorded for this period.</p>'; } else { orders.forEach(order => { const orderDiv = document.createElement('div'); orderDiv.className = 'editor-item'; let itemsText = Object.entries(order.items).map(([name, deets]) => `${deets.quantity}x ${name}`).join(', '); orderDiv.innerHTML = `<div><strong>${order.locationType} ${order.location}</strong> <small>(${new Date(order.timestamp).toLocaleString()})</small><br>${itemsText}</div><strong>$${order.total.toFixed(2)}</strong>`; salesDataContainer.appendChild(orderDiv); reportTotal += order.total; }); } reportTotalEl.textContent = `$${reportTotal.toFixed(2)}`; } catch (e) { salesDataContainer.innerHTML = `<p>Could not load sales data.</p>`; } }
+        async function loadAllSalesTotals(date) { const year = date.substring(0, 4); const month = date.substring(0, 7); const day = date; const allOrders = await (await fetch('/api/sales')).json(); const dailyTotal = allOrders.filter(o => o.timestamp.startsWith(day)).reduce((sum, o) => sum + o.total, 0); const monthlyTotal = allOrders.filter(o => o.timestamp.startsWith(month)).reduce((sum, o) => sum + o.total, 0); const yearlyTotal = allOrders.filter(o => o.timestamp.startsWith(year)).reduce((sum, o) => sum + o.total, 0); dailyTotalEl.textContent = `$${dailyTotal.toFixed(2)}`; monthlyTotalEl.textContent = `$${monthlyTotal.toFixed(2)}`; yearlyTotalEl.textContent = `$${yearlyTotal.toFixed(2)}`; loadSalesData('day', date); }
+        async function handleClearAllHistory() { if (!confirm(`ARE YOU SURE you want to CLEAR ALL sales history permanently? This cannot be undone.`)) return; try { await fetch('/api/sales/clear', { method: 'POST' }); alert(`All sales history has been cleared.`); loadAllSalesTotals(salesDateInput.value); } catch (e) { alert('Error clearing history.'); } }
+    });
+    </script>
 </body>
 </html>
