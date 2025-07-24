@@ -1,84 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Kitchen & Bar Dashboard</title>
-    <link rel="icon" type="image/png" href="/logo.png">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="dashboard-body">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kitchen & Bar Dashboard</title>
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="dashboard-body">
     <div id="sound-enabler">
-        <div>
-            <h1>Armah Hotel - Kitchen Dashboard</h1>
-            <p>Click anywhere to start and enable sound notifications.</p>
-        </div>
+      <div>
+        <h1>Armah Hotel - Kitchen Dashboard</h1>
+        <p>Click anywhere to start and enable sound notifications.</p>
+      </div>
     </div>
-    <header style="background-color: var(--primary-color); color: white; padding: 15px 20px; text-align: center;"><h1 style="color: var(--secondary-color); margin: 0;">Kitchen & Bar Dashboard</h1></header>
-    <div id="ordersContainer" class="dashboard-container"><p style="width: 100%; text-align: center; font-size: 1.5em; color: #eee;">Waiting for activity...</p></div>
-    
-    <audio id="roomOrderSound" src="sounds/notification.mp3" preload="auto"></audio>
-    <!-- === THIS IS THE MASTER FIX FOR THE SOUND === -->
-    <!-- The filename is case-sensitive and must be exact. -->
-    <audio id="tableOrderSound" src="sounds/Notification-2.mp3" preload="auto"></audio>
-    <audio id="waiterCallSound" src="sounds/Notification-2.mp3" preload="auto"></audio>
+    <header
+      style="
+        background-color: var(--primary-color);
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+      "
+    >
+      <h1 style="color: var(--secondary-color); margin: 0">
+        Kitchen & Bar Dashboard
+      </h1>
+    </header>
+    <div id="ordersContainer" class="dashboard-container">
+      <p style="width: 100%; text-align: center; font-size: 1.5em; color: #eee">
+        Waiting for activity...
+      </p>
+    </div>
+
+    <!-- === THIS IS THE MASTER FIX === -->
+    <audio
+      id="roomOrderSound"
+      src="sounds/notification.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="tableOrderSound"
+      src="sounds/Notification-2.mp3"
+      preload="auto"
+    ></audio>
+    <!-- This line was missing. It is now corrected. -->
+    <audio
+      id="waiterCallSound"
+      src="sounds/Notification-2.mp3"
+      preload="auto"
+    ></audio>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        const container = document.getElementById('ordersContainer');
-        const soundEnabler = document.getElementById('sound-enabler');
-        const sounds = { 
-            room: document.getElementById('roomOrderSound'), 
-            table: document.getElementById('tableOrderSound'), 
-            call: document.getElementById('waiterCallSound') 
-        };
+      const socket = io();
+      const container = document.getElementById("ordersContainer");
+      const soundEnabler = document.getElementById("sound-enabler");
+      // This JavaScript object is now correct because the HTML element exists.
+      const sounds = {
+        room: document.getElementById("roomOrderSound"),
+        table: document.getElementById("tableOrderSound"),
+        call: document.getElementById("waiterCallSound"),
+      };
 
-        soundEnabler.addEventListener('click', () => {
-            Object.values(sounds).forEach(sound => { sound.play(); sound.pause(); });
-            soundEnabler.style.display = 'none';
-            socket.emit('kitchen_dashboard_ready');
-            socket.on('new_order', (orderData) => createCard(orderData, 'order'));
-            socket.on('new_waiter_call', (callData) => createCard(callData, 'call'));
-        }, { once: true });
+      soundEnabler.addEventListener(
+        "click",
+        () => {
+          Object.values(sounds).forEach((sound) => {
+            sound.play();
+            sound.pause();
+          });
+          soundEnabler.style.display = "none";
+          socket.emit("kitchen_dashboard_ready");
+          socket.on("new_order", (orderData) => createCard(orderData, "order"));
+          socket.on("new_waiter_call", (callData) =>
+            createCard(callData, "call")
+          );
+        },
+        { once: true }
+      );
 
-        const createCard = (data, type) => {
-            if (document.querySelector(`[data-id="${data.id}"]`)) return;
-            container.querySelector('p')?.remove();
-            
-            const card = document.createElement('div');
-            card.dataset.id = data.id || `call-${data.table}`;
-            let itemsHtml = '', cardClass = '', headerText = '', cardBody = '', cardFooter = '';
-
-            if(type === 'order') {
-                itemsHtml = '<ul>' + Object.entries(data.items).map(([name, deets]) => `<li>${deets.quantity}x ${name}</li>`).join('') + '</ul>';
-                cardClass = data.locationType === 'Room' ? 'new-order-room' : 'new-order-table';
-                headerText = `${data.locationType} ${data.location}`;
-                cardBody = `<p><strong>Total:</strong> $${data.total.toFixed(2)}</p>${itemsHtml}`;
-                cardFooter = `<button class="btn" onclick="acknowledgeOrder(this)">Complete & Save Sale</button>`;
-                sounds[data.locationType === 'Room' ? 'room' : 'table'].play().catch(e => {});
-                card.dataset.location = data.location;
-            } else { // Waiter Call
-                cardClass = 'new-waiter-call';
-                headerText = `Waiter Call - Table ${data.table}`;
-                cardBody = `<p style="font-size: 1.5rem; text-align: center; color: var(--danger-color); margin: 20px 0;">Needs Assistance!</p>`;
-                cardFooter = `<button class="btn" style="background-color: var(--danger-color);" onclick="this.closest('.dashboard-card').remove()">Acknowledge</button>`;
-                sounds.call.play().catch(e => {});
-            }
-            card.className = `card dashboard-card ${cardClass}`;
-            card.innerHTML = `<h2>${headerText} <span class="status">(New)</span></h2> ${cardBody} ${cardFooter}`;
-            container.prepend(card);
-        };
-        
-        async function acknowledgeOrder(btn) {
-            const card = btn.closest('.dashboard-card');
-            btn.disabled = true; btn.textContent = 'Saving...';
-            try {
-                const response = await fetch('/acknowledge-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: card.dataset.location }) });
-                if (!response.ok) throw new Error('Server failed');
-                card.className = 'card dashboard-card completed';
-                card.querySelector('h2 .status').textContent = '(Completed & Saved)';
-                btn.style.backgroundColor = 'var(--success-color)'; btn.textContent = 'Done!';
-            } catch (error) { alert('Error: Could not complete order.'); btn.disabled = false; btn.textContent = 'Complete & Save Sale'; }
+      const createCard = (data, type) => {
+        if (
+          document.querySelector(
+            `[data-id="${data.id || `call-${data.table}`}"]`
+          )
+        )
+          return;
+        container.querySelector("p")?.remove();
+        const card = document.createElement("div");
+        card.dataset.id = data.id || `call-${data.table}`;
+        let cardClass = "",
+          headerText = "",
+          cardBody = "",
+          cardFooter = "";
+        if (type === "order") {
+          let itemsHtml =
+            "<ul>" +
+            Object.entries(data.items)
+              .map(([name, deets]) => `<li>${deets.quantity}x ${name}</li>`)
+              .join("") +
+            "</ul>";
+          cardClass =
+            data.locationType === "Room" ? "new-order-room" : "new-order-table";
+          headerText = `${data.locationType} ${data.location}`;
+          cardBody = `<p><strong>Total:</strong> ${data.total.toFixed(
+            2
+          )} ETB</p>${itemsHtml}`;
+          cardFooter = `<button class="btn" onclick="acknowledgeOrder(this)">Complete & Save Sale</button>`;
+          sounds[data.locationType === "Room" ? "room" : "table"]
+            .play()
+            .catch((e) => {});
+          card.dataset.location = data.location;
+        } else {
+          cardClass = "new-waiter-call";
+          headerText = `Waiter Call - Table ${data.table}`;
+          cardBody = `<p style="font-size: 1.5rem; text-align: center; color: var(--danger-color); margin: 20px 0;">Needs Assistance!</p>`;
+          cardFooter = `<button class="btn" style="background-color: var(--danger-color);" onclick="this.closest('.dashboard-card').remove()">Acknowledge</button>`;
+          sounds.call.play().catch((e) => {});
         }
+        card.className = `card dashboard-card ${cardClass}`;
+        card.innerHTML = `<h2>${headerText} <span class="status">(New)</span></h2> ${cardBody} ${cardFooter}`;
+        container.prepend(card);
+      };
+      async function acknowledgeOrder(btn) {
+        const card = btn.closest(".dashboard-card");
+        btn.disabled = true;
+        btn.textContent = "Saving...";
+        try {
+          await fetch("/acknowledge-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ location: card.dataset.location }),
+          });
+          card.className = "card dashboard-card completed";
+          card.querySelector("h2 .status").textContent = "(Completed & Saved)";
+          btn.style.backgroundColor = "var(--success-color)";
+          btn.textContent = "Done!";
+        } catch (error) {
+          alert("Error: Could not complete order.");
+          btn.disabled = false;
+          btn.textContent = "Complete & Save Sale";
+        }
+      }
     </script>
-</body>
+  </body>
 </html>

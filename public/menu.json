@@ -8,7 +8,7 @@
     "description_am": "በበርበሬ መረቅ የበሰለ እና በእንቁላል የቀረበ የበለጸገና ቅመም የበዛበት የዶሮ ወጥ።",
     "price": 250,
     "image": "uploads/1.jpg",
-    "isAvailable": true
+    "isAvailable": false
   },
   {
     "id": 2,
@@ -19,7 +19,7 @@
     "description_am": "እንደ ምስር፣ ሽምብራ እና ጎመን ያሉ የተለያዩ የአትክልት ወጦች የሚያምር ስብስብ።",
     "price": 220,
     "image": "uploads/2.jpg",
-    "isAvailable": true
+    "isAvailable": false
   },
   {
     "id": 3,
@@ -52,17 +52,6 @@
     "description_am": "ከፍተኛ ቦታ የታሸገ ምንጭ ውሃ።",
     "price": 30,
     "image": "uploads/6.png",
-    "isAvailable": true
-  },
-  {
-    "id": 1753243956082,
-    "name": "APEX",
-    "name_am": "ቸፈ",
-    "category": "Drinks",
-    "description": "ሰረየደቱፈዪ",
-    "description_am": "ሌሰረየደቱፈዪጉ",
-    "price": 25,
-    "image": "uploads/1753243955040.JPG",
     "isAvailable": true
   }
 ]

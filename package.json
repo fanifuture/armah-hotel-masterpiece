@@ -1,11 +1,10 @@
 {
-  "name": "armah-hotel-system-final",
+  "name": "armah-hotel-masterpiece",
   "version": "1.0.0",
-  "description": "Hotel Guest Portal and Management System",
+  "description": "Armah International Hotel Guest Portal and Management System",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "install": "npm install"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
